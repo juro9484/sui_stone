@@ -5,6 +5,9 @@ console.log('Starting server...');
 
 app.use(express.json());
 
+
+
+
 app.post('/api/game/higherlower/next', (req, res) => {
   console.log('POST /higherlower/next:', req.body);
   const { username, currentNumber, guess } = req.body;
