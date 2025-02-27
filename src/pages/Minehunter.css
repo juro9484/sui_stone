@@ -1,0 +1,67 @@
+.minehunter {
+    text-align: center;
+    padding: 20px;
+    margin: 0 auto;
+  }
+  
+  .controls {
+    margin-bottom: 10px;
+  }
+  
+  select {
+    padding: 5px;
+    font-size: 16px;
+  }
+  
+  .info {
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
+  
+  .grid {
+    display: grid;
+    gap: 1px;
+    background-color: #ccc;
+    padding: 1px;
+    max-width: 100%;
+    overflow: auto;
+    justify-content: center;
+  }
+  
+  .cell {
+    width: 30px;
+    height: 30px;
+    background-color: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  .cell.revealed {
+    background-color: #f0f0f0;
+  }
+  
+  .cell.flagged {
+    background-color: #ffeb3b;
+  }
+  
+  .message {
+    margin-top: 20px;
+  }
+  
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }

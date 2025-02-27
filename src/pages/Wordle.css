@@ -1,0 +1,54 @@
+.wordle {
+    text-align: center;
+    padding: 20px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  
+  .grid {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin: 20px 0;
+    width: 100%; /* Ensure it takes full width */
+  }
+  
+  .row {
+    display: flex;
+    flex-direction: row; /* Explicitly horizontal */
+    gap: 5px;
+    justify-content: center;
+    flex-wrap: nowrap; /* Prevent wrapping */
+  }
+  
+  .cell {
+    width: 60px;
+    height: 60px;
+    border: 2px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    text-transform: uppercase;
+    background-color: #fff;
+    flex: 0 0 auto; /* Prevent shrinking */
+  }
+  
+  .cell.correct {
+    background-color: #6aaa64;
+    color: white;
+    border-color: #6aaa64;
+  }
+  
+  .cell.present {
+    background-color: #c9b458;
+    color: white;
+    border-color: #c9b458;
+  }
+  
+  .cell.absent {
+    background-color: #787c7e;
+    color: white;
+    border-color: #787c7e;
+  }

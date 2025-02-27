@@ -1,0 +1,10 @@
+const mongoose = require('mongoose');
+
+const dailyWordSchema = new mongoose.Schema({
+  date: { type: String, required: true }, // e.g., "2025-02-23"
+  game: { type: String, required: true }, // "wordle" or "hangman"
+  difficulty: { type: String }, // "Easy", "Medium", "Hard" (null for Wordle)
+  word: { type: String, required: true },
+});
+
+module.exports = mongoose.model('DailyWord', dailyWordSchema);
