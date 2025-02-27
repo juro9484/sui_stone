@@ -127,7 +127,7 @@ const App: React.FC = () => {
         onClick={handleConnect}
         className="px-4 py-2 bg-gray-600 text-blue-500 font-semibold rounded-lg shadow-md hover:bg-gray-500 transition-all duration-200"
       >
-        Connect Sui Wallet
+        Connect Sui Wallet Now!
       </button>
     );
   };
