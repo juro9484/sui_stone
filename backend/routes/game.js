@@ -43,18 +43,61 @@ const regenerateDailyWords = async () => {
   }
   const today = new Date().toISOString().split('T')[0];
 
-  const generateHigherLower = async () => {
-    const dayOfWeek = new Date().getDay();
-    if (dayOfWeek !== 2 && dayOfWeek !== 6) return;
-    const existing = await DailyContent.findOne({ date: today, game: 'higherlower' });
+  const generateGameWord = async (game, words) => {
+    const existing = await DailyContent.findOne({ date: today, game });
     if (existing) return;
-    const content = 'HIGHERLOWER_PLACEHOLDER';
-    const newDailyContent = new DailyContent({ date: today, game: 'higherlower', content });
+    const word = words[Math.floor(Math.random() * words.length)];
+    const newDailyContent = new DailyContent({ date: today, game, content: word });
     await newDailyContent.save();
   };
 
-  await generateHigherLower(); // Add other games as needed
+  await generateGameWord('hangman', ['CRYPTO', 'SUISTONE', 'GROK', 'MINES', 'LEDGER']);
+  await generateGameWord('wordle', ['STONE', 'CRYPT', 'RELIC', 'GROVE', 'CHASM']);
+  await generateGameWord('higherlower', ['HIGHERLOWER_PLACEHOLDER']);
+  // Add trivia, minehunter as needed
 };
+
+router.get('/daily-word/hangman', async (req, res) => {
+  const today = new Date().toISOString().split('T')[0];
+  const username = req.query.username;
+  if (!username) return res.status(400).json({ error: 'Username required' });
+  try {
+    if (await hasPlayedToday(username, 'hangman')) {
+      return res.status(403).json({ error: 'You have already played Hangman today' });
+    }
+    if (!mongoose.connection.readyState) {
+      return res.status(200).json({ word: 'GROK' }); // Fallback word
+    }
+    await regenerateDailyWords();
+    const doc = await DailyContent.findOne({ date: today, game: 'hangman' });
+    if (!doc) return res.status(404).json({ error: 'No word found for today' });
+    res.status(200).json({ word: doc.content });
+  } catch (err) {
+    console.error('Error fetching hangman word:', err.message);
+    res.status(500).json({ error: 'Failed to fetch word from MongoDB, check backend!' });
+  }
+});
+
+router.get('/daily-word/wordle', async (req, res) => {
+  const today = new Date().toISOString().split('T')[0];
+  const username = req.query.username;
+  if (!username) return res.status(400).json({ error: 'Username required' });
+  try {
+    if (await hasPlayedToday(username, 'wordle')) {
+      return res.status(403).json({ error: 'You have already played Wordle today' });
+    }
+    if (!mongoose.connection.readyState) {
+      return res.status(200).json({ word: 'STONE' }); // Fallback word
+    }
+    await regenerateDailyWords();
+    const doc = await DailyContent.findOne({ date: today, game: 'wordle' });
+    if (!doc) return res.status(404).json({ error: 'No word found for today' });
+    res.status(200).json({ word: doc.content });
+  } catch (err) {
+    console.error('Error fetching wordle word:', err.message);
+    res.status(500).json({ error: 'Failed to fetch word from MongoDB, check backend!' });
+  }
+});
 
 router.get('/daily-word/higherlower', async (req, res) => {
   const today = new Date().toISOString().split('T')[0];
@@ -68,13 +111,16 @@ router.get('/daily-word/higherlower', async (req, res) => {
     if (await hasPlayedToday(username, 'higherlower')) {
       return res.status(403).json({ error: 'You have already played Higher/Lower today' });
     }
+    if (!mongoose.connection.readyState) {
+      return res.status(200).json({ message: 'Higher/Lower initialized (DB offline)' });
+    }
     await regenerateDailyWords();
     const doc = await DailyContent.findOne({ date: today, game: 'higherlower' });
     if (!doc) return res.status(404).json({ error: 'No state found for Higher/Lower' });
     res.status(200).json({ message: 'Higher/Lower initialized' });
   } catch (err) {
     console.error('Error fetching Higher/Lower state:', err.message);
-    res.status(500).json({ error: 'Failed to fetch Higher/Lower state', details: err.message });
+    res.status(500).json({ error: 'Failed to fetch word from MongoDB, check backend!' });
   }
 });
 
@@ -89,6 +135,8 @@ router.post('/higherlower/next', async (req, res) => {
   res.status(200).json({ nextNumber, correct });
 });
 
+// Add trivia, minehunter routes as needed...
+
 router.post('/score', async (req, res) => {
   const { username, game, points, time } = req.body;
   console.log('Received score POST:', { username, game, points, time });
@@ -97,7 +145,7 @@ router.post('/score', async (req, res) => {
   }
   if (!mongoose.connection.readyState) {
     console.log('MongoDB not connected, skipping score save');
-    return res.status(200).json({ message: 'Score not saved - DB offline', playerId: null });
+    return res.status(200).json({ message: 'Score not saved - DB offline' });
   }
   try {
     let player = await Player.findOne({ username });
@@ -128,7 +176,7 @@ router.get('/leaderboard/:game', async (req, res) => {
       { $group: { _id: '$username', totalPoints: { $sum: '$scores.points' }, minTime: { $min: '$scores.time' } } },
       { $sort: { totalPoints: -1, minTime: 1 } },
       { $limit: 10 },
-      { $project: { username: '$_id', points: '$totalPoints', time: '$minTime' } }
+      { $project: {username: '$_id', points: '$totalPoints', time: '$minTime' } }
     ]);
     res.status(200).json(leaderboard);
   } catch (err) {
