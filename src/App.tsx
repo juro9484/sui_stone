@@ -4,7 +4,7 @@ import { getFullnodeUrl } from '@mysten/sui/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
 import Static from './Static';
-
+import Experience from './Experience';
 
 const App: React.FC = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
@@ -140,7 +140,7 @@ const App: React.FC = () => {
                 </button>
               </div>
             </header>
-            <Static 
+            {/* <Static 
               theme={theme}
               toggleTheme={toggleTheme}
               walletAddress={walletAddress}
@@ -148,6 +148,8 @@ const App: React.FC = () => {
               leaderboard={leaderboard}
               selectGame={selectGame}
               goBackHome={goBackHome}
+            /> */}
+            <Experience
             />
           </div>
         </WalletProvider>
