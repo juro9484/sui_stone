@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SuiClientProvider, WalletProvider, useCurrentWallet, useConnectWallet } from '@mysten/dapp-kit';
+import { SuiClientProvider, WalletProvider, useCurrentWallet, useConnectWallet, useWallets } from '@mysten/dapp-kit';
 import { getFullnodeUrl } from '@mysten/sui/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
@@ -68,7 +68,8 @@ const App: React.FC = () => {
 
   const WalletConnect = () => {
     const { isConnected, currentWallet } = useCurrentWallet();
-    const { mutate: connectWallet } = useConnectWallet();
+    const wallets = useWallets();
+    const { mutate: connect } = useConnectWallet();
 
     useEffect(() => {
       const checkWallet = () => {
@@ -91,26 +92,10 @@ const App: React.FC = () => {
 
     const handleConnect = async () => {
       try {
-        console.log('Attempting to connect Sui Wallet...');
-        if (!window.suiWallet) {
-          console.log('Sui wallet extension not found. Prompting download.');
-          alert('Sui Wallet extension not detected. Please install it from the official site and refresh.');
-          return;
-        }
-
-        if (currentWallet) {
-          console.log('Connecting to detected wallet:', currentWallet.name);
-          await connectWallet({ wallet: currentWallet });
-          if (isConnected && currentWallet.accounts.length > 0) {
-            setWalletAddress(currentWallet.accounts[0].address);
-            console.log('Connected Sui Wallet:', currentWallet.accounts[0].address);
-          } else {
-            console.log('Connection attempt succeeded but no accounts found.');
-          }
-        } else {
-          console.log('No Sui Wallet available to connect.');
-          alert('No Sui Wallet detected. Please ensure it’s installed and enabled.');
-        }
+        const wallet = wallets[0];
+        connect({wallet}, {
+          onSuccess: () => console.log('connected'),
+        });
       } catch (error: unknown) { // Use unknown per TS rules
         const walletError = error as Error; // Cast inside block
         console.error('Sui Wallet connection failed:', walletError.message || walletError);
@@ -127,7 +112,7 @@ const App: React.FC = () => {
         onClick={handleConnect}
         className="px-4 py-2 bg-gray-600 text-blue-500 font-semibold rounded-lg shadow-md hover:bg-gray-500 transition-all duration-200"
       >
-        Connect Sui Wallet Now!
+        Connect Sui Wallet
       </button>
     );
   };
