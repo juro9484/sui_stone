@@ -1,9 +1,11 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { StyleSheet, Platform, Image } from 'react-native';
+import { Link } from 'expo-router';
 
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { Experience3D } from '@/components/Experience3D';
 
 export default function HomeScreen() {
   return (
@@ -16,38 +18,36 @@ export default function HomeScreen() {
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
+        <ThemedText type="title">Welcome to SuiStone!</ThemedText>
         <HelloWave />
       </ThemedView>
+      
+      <Experience3D />
+      
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
+        <ThemedText type="subtitle">Play Now</ThemedText>
         <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
+          Check out our collection of games by tapping the Games tab or using the button below.
         </ThemedText>
+        <Link href="/games" style={styles.button}>
+          <ThemedText style={styles.buttonText}>Play Games</ThemedText>
+        </Link>
       </ThemedView>
+      
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
+        <ThemedText type="subtitle">Leaderboards</ThemedText>
         <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
+          View the top players and their scores on our leaderboards.
         </ThemedText>
+        <Link href="/leaderboard" style={styles.button}>
+          <ThemedText style={styles.buttonText}>View Leaderboards</ThemedText>
+        </Link>
       </ThemedView>
+      
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
+        <ThemedText type="subtitle">Connect Wallet</ThemedText>
         <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
+          Connect your Sui wallet to track your scores and achievements.
         </ThemedText>
       </ThemedView>
     </ParallaxScrollView>
@@ -59,10 +59,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    marginBottom: 12,
   },
   stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+    gap: 12,
+    marginBottom: 20,
   },
   reactLogo: {
     height: 178,
@@ -71,4 +72,15 @@ const styles = StyleSheet.create({
     left: 0,
     position: 'absolute',
   },
+  button: {
+    backgroundColor: '#0088cc',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  }
 });
