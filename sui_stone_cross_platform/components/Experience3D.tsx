@@ -1,8 +1,8 @@
 import React, { useRef } from 'react';
-import { StyleSheet, View, Platform } from 'react-native';
-import { Canvas, useFrame } from '@react-three/fiber/native';
+import { StyleSheet, View, Text, Platform } from 'react-native';
+import { Canvas } from '@react-three/fiber/native';
 // import * as THREE from 'three';
-import { useThemeColor } from '@/hooks/useThemeColor';
+// import { useThemeColor } from '@/hooks/useThemeColor';
 
 // function Box(props: any) {
 //   // This reference gives us direct access to the THREE.Mesh object
@@ -28,10 +28,10 @@ import { useThemeColor } from '@/hooks/useThemeColor';
 // }
 
 export function Experience3D() {
-  const backgroundColor = useThemeColor({}, 'background');
+  // const backgroundColor = useThemeColor({}, 'background');
   
   return (
-    <View style={[styles.container, { backgroundColor }]}>
+    <View style={[styles.container]}>
       {/* <Canvas
         gl={{ preserveDrawingBuffer: true }} // Important for Android
         style={styles.canvas}
@@ -47,14 +47,21 @@ export function Experience3D() {
           <meshBasicMaterial color="hotpink" />
         </mesh>
       </Canvas>
+      <Text>Hello World!</Text>
+
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    // width: '100%',
+    // height: 250,
+    // marginBottom: 20
+    // height: 150,
     width: '100%',
-    height: 250,
-    marginBottom: 20
+    flex: 1
+    // alignItems: 'center',
+    // justifyContent: 'center'
   }
 });
