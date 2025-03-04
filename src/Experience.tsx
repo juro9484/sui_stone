@@ -1,9 +1,11 @@
 import { Canvas, useThree, useFrame, ThreeEvent } from '@react-three/fiber';
-import { OrbitControls, Environment } from '@react-three/drei';
+import { OrbitControls, Environment, Html } from '@react-three/drei';
 import { Suspense, useRef, useCallback, useState } from 'react';
 import React from 'react';
 import { Scene } from './components/Scene';
 import { Vector3, Object3D, Camera, Euler, MathUtils } from 'three';
+import Hangman from './pages/Hangman';
+import Wordle from './pages/Wordle';
 
 // Create a wrapper for the Scene component to handle clicks
 function InteractiveScene({ onCubeClick }: { onCubeClick: () => void }) {
@@ -20,6 +22,36 @@ function InteractiveScene({ onCubeClick }: { onCubeClick: () => void }) {
   return (
     <group onClick={handleSceneClick}>
       <Scene />
+      <mesh position={[-8.2, 5.75, 2.64]} rotation={[0, Math.PI / 2, 0]}>
+        <planeGeometry args={[5, 4]} />
+        <meshBasicMaterial color="#111111" opacity={0.9} transparent />
+        <Html
+          transform
+          rotation-x={10 * Math.PI / 365}
+          rotation-y={Math.PI}
+          position={[0, -.2, 0]}
+          style={{
+            width: '600px',
+            height: '500px',
+            backgroundColor: 'transparent',
+            overflow: 'hidden',
+            transform: 'scale(0.8)',
+            transformOrigin: 'center center'
+          }}
+          distanceFactor={1}
+          occlude
+        >
+          <div style={{ 
+            width: '100%', 
+            height: '100%', 
+            overflow: 'auto',
+            padding: '10px',
+            boxSizing: 'border-box'
+          }}>
+            <Wordle username="player" goBackHome={() => {}} />
+          </div>
+        </Html>
+      </mesh>
     </group>
   );
 }
@@ -46,7 +78,9 @@ export default function Experience() {
       
       // Set the target position and rotation for smooth animation
       startPositionRef.current = new Vector3().copy(cameraRef.current.position);
-      targetPositionRef.current = new Vector3(-9.66, 5.75, 2.64);
+      // targetPositionRef.current = new Vector3(-9.66, 5.75, 2.64);
+      targetPositionRef.current = new Vector3(-10.16, 5.75, 2.81);
+
       
       // Store initial rotation
       startRotationRef.current = new Euler().copy(cameraRef.current.rotation);
