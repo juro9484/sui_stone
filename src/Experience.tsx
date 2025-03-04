@@ -1,6 +1,6 @@
 import { Canvas, useThree, useFrame, ThreeEvent } from '@react-three/fiber';
 import { OrbitControls, Environment } from '@react-three/drei';
-import { Suspense, useRef, useCallback } from 'react';
+import { Suspense, useRef, useCallback, useState } from 'react';
 import React from 'react';
 import { Scene } from './components/Scene';
 import { Vector3, Object3D, Camera, Euler, MathUtils } from 'three';
@@ -31,6 +31,9 @@ export default function Experience() {
   const animationDurationRef = useRef(1000); // Animation duration in ms
   const startTimeRef = useRef(0);
   
+  // State to toggle OrbitControls on/off
+  const [orbitControlsEnabled, setOrbitControlsEnabled] = useState(true);
+  
   // Store the initial camera position and rotation for animation
   const startPositionRef = useRef<Vector3 | null>(null);
   const startRotationRef = useRef<Euler | null>(null);
@@ -38,6 +41,9 @@ export default function Experience() {
   
   const handleCubeClick = useCallback(() => {
     if (cameraRef.current) {
+      // Disable orbit controls when cube is clicked
+      setOrbitControlsEnabled(false);
+      
       // Set the target position and rotation for smooth animation
       startPositionRef.current = new Vector3().copy(cameraRef.current.position);
       targetPositionRef.current = new Vector3(-9.66, 5.75, 2.64);
@@ -83,11 +89,32 @@ export default function Experience() {
         Camera: Loading...
       </div>
       
+      {!orbitControlsEnabled && (
+        <button
+          onClick={() => setOrbitControlsEnabled(true)}
+          style={{
+            position: 'absolute',
+            bottom: '20px',
+            right: '20px',
+            zIndex: 100,
+            padding: '10px 15px',
+            backgroundColor: '#2563eb',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontWeight: 'bold'
+          }}
+        >
+          Enable Controls
+        </button>
+      )}
+      
       <Canvas camera={{ position: [10, 20, 40], fov: 45 }}>
         <Suspense fallback={null}>
           <Environment preset="sunset" />
           <InteractiveScene onCubeClick={handleCubeClick} />
-          <OrbitControls />
+          {orbitControlsEnabled && <OrbitControls />}
           <CameraUpdater 
             overlayRef={overlayRef} 
             cameraRef={cameraRef} 
