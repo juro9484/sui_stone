@@ -128,7 +128,7 @@ const App: React.FC = () => {
               <div className="bg-[radial-gradient(circle_at_50%_50%,_rgba(2,136,209,0.2)_0%,_rgba(2,136,209,0)_70%)] animate-pulse-slow w-[200%] h-[200%] absolute top-[-50%] left-[-50%]"></div>
               <div className="bg-[radial-gradient(circle_at_20%_80%,_rgba(2,136,209,0.15)_0%,_rgba(2,136,209,0)_60%)] animate-pulse-slow w-[150%] h-[150%] absolute bottom-[-25%] left-[-25%]"></div>
             </div>
-            <header className="flex justify-between items-center p-4 bg-gray-700 shadow-md border-b border-gray-600 relative z-10">
+            {/* <header className="flex justify-between items-center p-4 bg-gray-700 shadow-md border-b border-gray-600 relative z-10">
               <h1 className="text-2xl font-bold text-blue-500 drop-shadow-md">SuiStone</h1>
               <div className="flex items-center gap-4">
                 <WalletConnect />
@@ -139,7 +139,7 @@ const App: React.FC = () => {
                   {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
                 </button>
               </div>
-            </header>
+            </header> */}
             {/* <Static 
               theme={theme}
               toggleTheme={toggleTheme}
