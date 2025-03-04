@@ -4,7 +4,12 @@ import Wordle from '../pages/Wordle';
 
 const WordlePortal: React.FC = () => {
   return (
-    <mesh position={[-8.2, 5.75, 2.64]} rotation={[0, Math.PI / 2, 0]}>
+    <mesh 
+      position={[-8.2, 5.75, 2.64]} 
+      rotation={[0, Math.PI / 2, 0]}
+      name="wordle-portal"
+      userData={{ targetCamera: "wordle" }}
+    >
       <planeGeometry args={[5, 4]} />
       <meshBasicMaterial color="#1f2937" opacity={0} transparent />
       <Html

@@ -1,26 +1,17 @@
 import { Canvas, useThree, useFrame, ThreeEvent } from '@react-three/fiber';
 import { OrbitControls, Environment } from '@react-three/drei';
-import { Suspense, useRef, useCallback, useState } from 'react';
+import { Suspense, useRef, useCallback, useState, useEffect } from 'react';
 import React from 'react';
 import { Scene } from './components/Scene';
-import { Vector3, Object3D, Camera, Euler, MathUtils } from 'three';
-import Hangman from './pages/Hangman';
+import { Camera } from 'three';
 import WordlePortal from './components/WordlePortal';
+import { CameraController } from './utils/cameraController';
+import { findTargetByObject } from './utils/cameraTargets';
 
 // Create a wrapper for the Scene component to handle clicks
-function InteractiveScene({ onCubeClick }: { onCubeClick: () => void }) {
-  // We'll use the existing Scene component and add a click handler via event bubbling
-  const handleSceneClick = useCallback((event: ThreeEvent<MouseEvent>) => {
-    // Check if the clicked object is the specific mesh we tagged in the Scene component
-    if (event.object.name === "pCube11_THREE_0" || event.object.userData?.clickable) {
-      // Found our target object, trigger the camera position change
-      onCubeClick();
-      event.stopPropagation();
-    }
-  }, [onCubeClick]);
-  
+function InteractiveScene({ onObjectClick }: { onObjectClick: (event: ThreeEvent<MouseEvent>) => void }) {
   return (
-    <group onClick={handleSceneClick}>
+    <group onClick={onObjectClick}>
       <Scene />
       <WordlePortal />
     </group>
@@ -29,43 +20,24 @@ function InteractiveScene({ onCubeClick }: { onCubeClick: () => void }) {
 
 export default function Experience() {
   const overlayRef = useRef<HTMLDivElement>(null);
+  const cameraControllerRef = useRef<CameraController | null>(null);
   const cameraRef = useRef<Camera>();
-  const targetPositionRef = useRef<Vector3 | null>(null);
-  const animationDurationRef = useRef(1000); // Animation duration in ms
-  const startTimeRef = useRef(0);
   
   // State to toggle OrbitControls on/off
   const [orbitControlsEnabled, setOrbitControlsEnabled] = useState(true);
   
-  // Store the initial camera position and rotation for animation
-  const startPositionRef = useRef<Vector3 | null>(null);
-  const startRotationRef = useRef<Euler | null>(null);
-  const targetRotationRef = useRef<Euler | null>(null);
-  
-  const handleCubeClick = useCallback(() => {
-    if (cameraRef.current) {
-      // Disable orbit controls when cube is clicked
-      setOrbitControlsEnabled(false);
-      
-      // Set the target position and rotation for smooth animation
-      startPositionRef.current = new Vector3().copy(cameraRef.current.position);
-      // targetPositionRef.current = new Vector3(-9.66, 5.75, 2.64);
-      targetPositionRef.current = new Vector3(-9.49,5.67,2.7);
-
-      
-      // Store initial rotation
-      startRotationRef.current = new Euler().copy(cameraRef.current.rotation);
-      
-      // Set target rotation in radians (-90, -90, 90 degrees)
-      const degToRad = MathUtils.degToRad;
-      targetRotationRef.current = new Euler(
-        degToRad(-79.4),  // X rotation
-        degToRad(-83.8),  // Y rotation
-        degToRad(-79.3)    // Z rotation
-      );
-      
-      // Start animation
-      startTimeRef.current = Date.now();
+  // Handle object click and move camera to appropriate target
+  const handleObjectClick = useCallback((event: ThreeEvent<MouseEvent>) => {
+    // Find if the clicked object has an associated camera target
+    const target = findTargetByObject(
+      event.object.name, 
+      event.object.userData
+    );
+    
+    // If we found a target and have a camera controller, move to that target
+    if (target && cameraControllerRef.current) {
+      cameraControllerRef.current.moveToTarget(target);
+      event.stopPropagation();
     }
   }, []);
   
@@ -96,7 +68,11 @@ export default function Experience() {
       
       {!orbitControlsEnabled && (
         <button
-          onClick={() => setOrbitControlsEnabled(true)}
+          onClick={() => {
+            if (cameraControllerRef.current) {
+              cameraControllerRef.current.enableOrbitControls();
+            }
+          }}
           style={{
             position: 'absolute',
             bottom: '20px',
@@ -118,17 +94,13 @@ export default function Experience() {
       <Canvas camera={{ position: [10, 20, 40], fov: 45 }}>
         <Suspense fallback={null}>
           <Environment preset="sunset" />
-          <InteractiveScene onCubeClick={handleCubeClick} />
+          <InteractiveScene onObjectClick={handleObjectClick} />
           {orbitControlsEnabled && <OrbitControls />}
           <CameraUpdater 
             overlayRef={overlayRef} 
-            cameraRef={cameraRef} 
-            targetPositionRef={targetPositionRef}
-            startPositionRef={startPositionRef}
-            startRotationRef={startRotationRef}
-            targetRotationRef={targetRotationRef}
-            startTimeRef={startTimeRef}
-            animationDurationRef={animationDurationRef}
+            cameraRef={cameraRef}
+            cameraControllerRef={cameraControllerRef}
+            setOrbitControlsEnabled={setOrbitControlsEnabled}
           />
         </Suspense>
       </Canvas>
@@ -139,34 +111,40 @@ export default function Experience() {
 type CameraUpdaterProps = {
   overlayRef: React.RefObject<HTMLDivElement>;
   cameraRef: React.MutableRefObject<Camera | undefined>;
-  targetPositionRef: React.MutableRefObject<Vector3 | null>;
-  startPositionRef: React.MutableRefObject<Vector3 | null>;
-  startRotationRef: React.MutableRefObject<Euler | null>;
-  targetRotationRef: React.MutableRefObject<Euler | null>;
-  startTimeRef: React.MutableRefObject<number>;
-  animationDurationRef: React.MutableRefObject<number>;
+  cameraControllerRef: React.MutableRefObject<CameraController | null>;
+  setOrbitControlsEnabled: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 function CameraUpdater({ 
   overlayRef, 
-  cameraRef, 
-  targetPositionRef, 
-  startPositionRef,
-  startRotationRef,
-  targetRotationRef,
-  startTimeRef, 
-  animationDurationRef 
+  cameraRef,
+  cameraControllerRef,
+  setOrbitControlsEnabled
 }: CameraUpdaterProps) {
   const { camera } = useThree();
   
   // Store camera reference
   cameraRef.current = camera;
   
+  // Initialize camera controller
+  useEffect(() => {
+    if (camera) {
+      cameraControllerRef.current = new CameraController(
+        camera,
+        setOrbitControlsEnabled
+      );
+    }
+  }, [camera, setOrbitControlsEnabled]);
+  
   useFrame(() => {
-    // Limit camera position to 90 for all axes
-    camera.position.x = Math.max(-40, Math.min(40, camera.position.x));
-    camera.position.y = Math.max(-10, Math.min(40, camera.position.y));
-    camera.position.z = Math.max(-40, Math.min(40, camera.position.z));
+    // Update camera controller
+    if (cameraControllerRef.current) {
+      // Apply constraints to camera position
+      cameraControllerRef.current.applyConstraints(-40, 40, -10, 40, -40, 40);
+      
+      // Update animation
+      cameraControllerRef.current.update();
+    }
 
     // Update position and rotation display
     if (overlayRef.current) {
@@ -181,46 +159,6 @@ function CameraUpdater({
       const rotZ = Math.round(camera.rotation.z * 180 / Math.PI * 10) / 10;
       
       overlayRef.current.innerHTML = `Position: [${x}, ${y}, ${z}]<br>Rotation: [${rotX}°, ${rotY}°, ${rotZ}°]`;
-    }
-    
-    // Handle smooth camera animation if a target position and rotation are set
-    if (targetPositionRef.current && startPositionRef.current && 
-        targetRotationRef.current && startRotationRef.current) {
-      const elapsed = Date.now() - startTimeRef.current;
-      const progress = Math.min(elapsed / animationDurationRef.current, 1);
-      
-      if (progress < 1) {
-        // Apply easing function for smoother animation (ease-out cubic)
-        const t = 1 - Math.pow(1 - progress, 3);
-        
-        // Interpolate between start position and target position
-        camera.position.lerpVectors(
-          startPositionRef.current,
-          targetPositionRef.current,
-          t
-        );
-        
-        // Interpolate between start rotation and target rotation
-        // For each axis (x, y, z)
-        camera.rotation.x = startRotationRef.current.x + 
-          (targetRotationRef.current.x - startRotationRef.current.x) * t;
-          
-        camera.rotation.y = startRotationRef.current.y + 
-          (targetRotationRef.current.y - startRotationRef.current.y) * t;
-          
-        camera.rotation.z = startRotationRef.current.z + 
-          (targetRotationRef.current.z - startRotationRef.current.z) * t;
-      } else {
-        // Animation complete, set final position and rotation, then clear targets
-        camera.position.copy(targetPositionRef.current);
-        camera.rotation.copy(targetRotationRef.current);
-        
-        // Clear all references
-        targetPositionRef.current = null;
-        startPositionRef.current = null;
-        targetRotationRef.current = null;
-        startRotationRef.current = null;
-      }
     }
   });
   
