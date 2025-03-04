@@ -151,7 +151,18 @@ export function Scene(props) {
       <mesh geometry={nodes.polySurface121_THREE_0.geometry} material={materials.THREE} position={[-3.577, 1.756, -10.407]} rotation={[0, -1.571, 0]} />
       <mesh geometry={nodes.polySurface122_THREE_0.geometry} material={materials.THREE} position={[0.482, 14.396, 5.125]} scale={[0.077, 1, 0.342]} />
       <mesh geometry={nodes.pCube10_THREE_0.geometry} material={materials.THREE} position={[-6.633, 11.854, 8.145]} rotation={[0, -1.571, 0]} scale={[1.673, 4.625, 0.275]} />
-      <mesh geometry={nodes.pCube11_THREE_0.geometry} material={materials.THREE} position={[-6.633, 7.117, 8.145]} rotation={[0, -1.571, 0]} scale={[1.673, 4.625, 0.275]} />
+      <mesh 
+        geometry={nodes.pCube11_THREE_0.geometry} 
+        material={materials.THREE} 
+        position={[-6.633, 7.117, 8.145]} 
+        rotation={[0, -1.571, 0]} 
+        scale={[1.673, 4.625, 0.275]}
+        name="pCube11_THREE_0" // Add name to help with identifying the mesh
+        userData={{ clickable: true }} // Add userData to help identify this mesh
+        cursor="pointer" // Change cursor to pointer when hovering this mesh
+        onPointerOver={(e) => document.body.style.cursor = 'pointer'}
+        onPointerOut={(e) => document.body.style.cursor = 'default'}
+      />
       <mesh geometry={nodes.pCube9_THREE_0.geometry} material={materials.THREE} position={[4.12, 5.749, 1.209]} scale={[1.25, 3.454, 0.275]} />
       <mesh geometry={nodes.pCylinder27_THREE_0.geometry} material={materials.THREE} position={[-6.633, 8.937, 7.241]} rotation={[Math.PI / 2, 0, 0]} scale={[0.034, 0.093, 0.034]} />
       <mesh geometry={nodes.pCylinder28_THREE_0.geometry} material={materials.THREE} position={[-6.633, 9.282, 7.241]} rotation={[Math.PI / 2, 0, 0]} scale={[0.034, 0.093, 0.034]} />
