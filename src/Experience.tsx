@@ -6,7 +6,7 @@ import { Scene } from './components/Scene';
 import { Camera } from 'three';
 import WordlePortal from './components/WordlePortal';
 import { CameraController } from './utils/cameraController';
-import { findTargetByObject } from './utils/cameraTargets';
+import { findTargetByObject, CAMERA_TARGETS } from './utils/cameraTargets';
 
 // Create a wrapper for the Scene component to handle clicks
 function InteractiveScene({ onObjectClick }: { onObjectClick: (event: ThreeEvent<MouseEvent>) => void }) {
@@ -70,7 +70,14 @@ export default function Experience() {
         <button
           onClick={() => {
             if (cameraControllerRef.current) {
-              cameraControllerRef.current.enableOrbitControls();
+              // Move to the default view target
+              cameraControllerRef.current.moveToTarget(CAMERA_TARGETS.default);
+              // Enable orbit controls after camera moves to position
+              setTimeout(() => {
+                if (cameraControllerRef.current) {
+                  cameraControllerRef.current.enableOrbitControls();
+                }
+              }, CAMERA_TARGETS.default.duration || 0);
             }
           }}
           style={{
@@ -87,7 +94,7 @@ export default function Experience() {
             fontWeight: 'bold'
           }}
         >
-          Enable Controls
+          Back to Overview
         </button>
       )}
       

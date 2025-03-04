@@ -28,10 +28,6 @@ export class CameraController {
   
   // Move camera to target
   public moveToTarget(target: CameraTarget): void {
-    // Disable orbit controls when moving to a target
-    this.setOrbitControlsEnabled(false);
-    this.orbitControlsEnabled = false;
-    
     // Save current position and rotation
     this.startPosition = new Vector3().copy(this.camera.position);
     this.startRotation = new Euler().copy(this.camera.rotation);
@@ -42,6 +38,12 @@ export class CameraController {
     
     // Set animation duration (or use default)
     this.duration = target.duration || 1000;
+    
+    // Disable orbit controls during movement (unless we're going to default view)
+    if (target.targetId !== 'default-view') {
+      this.setOrbitControlsEnabled(false);
+      this.orbitControlsEnabled = false;
+    }
     
     // Start animation
     this.startTime = Date.now();
