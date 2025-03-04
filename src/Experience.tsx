@@ -192,6 +192,11 @@ function CameraUpdater({
   cameraRef.current = camera;
   
   useFrame(() => {
+    // Limit camera position to 90 for all axes
+    camera.position.x = Math.max(-40, Math.min(40, camera.position.x));
+    camera.position.y = Math.max(-10, Math.min(40, camera.position.y));
+    camera.position.z = Math.max(-40, Math.min(40, camera.position.z));
+
     // Update position and rotation display
     if (overlayRef.current) {
       // Position with 2 decimal places
