@@ -5,8 +5,10 @@ import React from 'react';
 import { Scene } from './components/Scene';
 import { Camera } from 'three';
 import WordlePortal from './components/WordlePortal';
+import WalletConnect from './components/WalletConnect';
 import { CameraController } from './utils/cameraController';
 import { findTargetByObject, CAMERA_TARGETS } from './utils/cameraTargets';
+
 
 // Create a wrapper for the Scene component to handle clicks
 function InteractiveScene({ onObjectClick }: { onObjectClick: (event: ThreeEvent<MouseEvent>) => void }) {
@@ -64,6 +66,20 @@ export default function Experience() {
         id="camera-position-display"
       >
         Camera: Loading...
+      </div>
+      
+      <div 
+        style={{ 
+          position: 'absolute', 
+          top: '10px', 
+          right: '10px', 
+          zIndex: 100,
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          padding: '8px',
+          borderRadius: '4px',
+        }} 
+      >
+        <WalletConnect />
       </div>
       
       {!orbitControlsEnabled && (
